@@ -32,4 +32,9 @@ module.exports = {
 	Stream: require( "./lib/stream" ),
 	Context: require( "./lib/context" ),
 	Parser: require( "./lib/parser" ),
+
+	BufferStream: {
+		Reader: require( "./lib/buffer" ).BufferReadStream,
+		Writer: require( "./lib/buffer" ).BufferWriteStream,
+	},
 };
