@@ -116,19 +116,24 @@ suite( "Piping data through ParsingStream", function() {
 		const message = "I were there where is no atmosphere";
 
 		const parser = new SubstringParser( Buffer.from( "ere ", "ascii" ) );
+		parser.onMatch = function( context, buffers, atOffset ) {
+			this.should.be.equal( parser );
+			context.should.be.equal( stream.context );
+			buffers.should.be.Array().which.is.not.empty();
+			atOffset.should.be.Number().which.is.above( -1 );
+
+			if ( !Array.isArray( context.matches ) ) {
+				context.matches = [];
+			}
+
+			context.matches.push( { match: this.data, offset: atOffset } );
+		};
+
 		const source = new BufferStream.Reader( Buffer.from( message, "ascii" ), 2 );
 		const target = new BufferStream.Writer();
 		const stream = new Stream( {
 			initialParser: parser,
 		} );
-
-		parser.onMatch = function( context, parser, atOffset ) {
-			if ( !Array.isArray( context.matches ) ) {
-				context.matches = [];
-			}
-
-			context.matches.push( { match: parser.data, offset: atOffset } );
-		};
 
 		stream.pipe( target );
 		source.pipe( stream );
@@ -154,6 +159,91 @@ suite( "Piping data through ParsingStream", function() {
 				stream.context.matches[0].offset.should.be.equal( 3 );
 				stream.context.matches[1].offset.should.be.equal( 9 );
 				stream.context.matches[2].offset.should.be.equal( 15 );
+			} );
+	} );
+
+	test( "supports switching attached parser", function() {
+		const message = "I were there where is no atmosphere";
+
+		const parser1 = new SubstringParser( Buffer.from( "ere ", "ascii" ) );
+		parser1.onMatch = function( context, buffers, atOffset ) {
+			this.should.be.equal( parser1 );
+			context.should.be.equal( stream.context );
+			buffers.should.be.Array().which.is.not.empty();
+			atOffset.should.be.Number().which.is.above( -1 );
+
+			if ( !Array.isArray( context.matches ) ) {
+				context.matches = [];
+			}
+
+			context.matches.push( { match: this.data, offset: atOffset } );
+
+			return parser2;
+		};
+
+		const parser2 = new SubstringParser( Buffer.from( "is no ", "ascii" ) );
+		parser2.onMatch = function( context, buffers, atOffset ) {
+			this.should.be.equal( parser2 );
+
+			if ( !Array.isArray( context.matches ) ) {
+				context.matches = [];
+			}
+
+			context.matches.push( { match: this.data, offset: atOffset } );
+		};
+
+		const source = new BufferStream.Reader( Buffer.from( message, "ascii" ), 2 );
+		const target = new BufferStream.Writer();
+		const stream = new Stream( {
+			initialParser: parser1,
+		} );
+
+		stream.pipe( target );
+		source.pipe( stream );
+
+		return target.asPromise
+			.then( data => {
+				data.should.be.instanceOf( Buffer );
+				data.toString( "ascii" ).should.be.equal( message );
+
+				stream.context.should.have.a.property( "matches" ).which.is.an.Array().and.has.a.length( 2 );
+
+				stream.context.matches[0].should.be.an.Object().and.have.properties( "match", "offset" ).and.has.a.size( 2 );
+				stream.context.matches[1].should.be.an.Object().and.have.properties( "match", "offset" ).and.has.a.size( 2 );
+
+				stream.context.matches[0].match.should.be.an.instanceOf( Buffer ).and.has.a.length( 4 );
+				stream.context.matches[0].match.toString( "ascii" ).should.is.equal( "ere " );
+				stream.context.matches[1].match.should.be.an.instanceOf( Buffer ).and.has.a.length( 6 );
+				stream.context.matches[1].match.toString( "ascii" ).should.be.equal( "is no " );
+
+				stream.context.matches[0].offset.should.be.equal( 3 );
+				stream.context.matches[1].offset.should.be.equal( 19 );
+			} );
+	} );
+
+	test( "supports adjusting parser matches in stream", function() {
+		const message = "I were there where is no atmosphere";
+
+		const parser = new SubstringParser( Buffer.from( "ere ", "ascii" ) );
+		parser.onMatch = function( context, buffers ) {
+			buffers.unshift( Buffer.from( ">>", "ascii" ) );
+			buffers.push( Buffer.from( "<<", "ascii" ) );
+		};
+
+		const source = new BufferStream.Reader( Buffer.from( message, "ascii" ), 2 );
+		const target = new BufferStream.Writer();
+		const stream = new Stream( {
+			initialParser: parser,
+		} );
+
+		stream.pipe( target );
+		source.pipe( stream );
+
+		return target.asPromise
+			.then( data => {
+				data.should.be.instanceOf( Buffer );
+				data.toString( "ascii" ).should.not.be.equal( message );
+				data.toString( "ascii" ).should.be.equal( "I w>>ere <<th>>ere <<wh>>ere <<is no atmosphere" );
 			} );
 	} );
 } );
