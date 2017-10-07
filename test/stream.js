@@ -227,6 +227,8 @@ suite( "Piping data through ParsingStream", function() {
 		const parser = new SubstringParser( Buffer.from( "ere ", "ascii" ) );
 		parser.onMatch = function( context, buffers ) {
 			buffers.unshift( Buffer.from( ">>", "ascii" ) );
+			buffers.unshift( Buffer.alloc( 0 ) );
+			buffers.push( Buffer.from( "", "ascii" ) );
 			buffers.push( Buffer.from( "<<", "ascii" ) );
 		};
 
