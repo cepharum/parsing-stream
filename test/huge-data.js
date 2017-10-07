@@ -33,9 +33,7 @@ const Path = require( "path" );
 const File = require( "fs" );
 const Crypt = require( "crypto" );
 
-const Should = require( "should" );
-
-const { Stream, Parser, Context, BufferStream, SubstringParser } = require( "../" );
+const { Stream, SubstringParser } = require( "../" );
 
 
 suite( "Processing huge data", function() {
