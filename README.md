@@ -2,9 +2,11 @@
 
 _attaching parser/processor to NodeJS stream_
 
+## License
 
-This module provides a byte-mode passthrough stream supporting attachment of parsers that might process and adjust parts of streamed data matching parser.
+[MIT](LICENSE)
 
-## API
+## About
 
-tbd.
+This module provides an octet-by-octet pass-through stream for attaching parsers to process and adjust parts of streamed data matching conditions of attached parser.
+
