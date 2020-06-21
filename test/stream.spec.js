@@ -30,48 +30,49 @@
 
 const { Readable, Writable, Duplex, Transform } = require( "stream" );
 
+const { describe, it } = require( "mocha" );
 const Should = require( "should" );
 
 const { Stream, Parser, Context, BufferStream, SubstringParser } = require( "../" );
 
 
-suite( "ParsingStream", function() {
-	test( "is a readable stream", function() {
+describe( "ParsingStream", function() {
+	it( "is a readable stream", function() {
 		const stream = new Stream();
 
 		stream.should.be.instanceOf( Readable );
 	} );
 
-	test( "is a writable stream", function() {
+	it( "is a writable stream", function() {
 		const stream = new Stream();
 
 		stream.should.be.instanceOf( Writable );
 	} );
 
-	test( "hence is a duplex stream", function() {
+	it( "hence is a duplex stream", function() {
 		const stream = new Stream();
 
 		stream.should.be.instanceOf( Duplex );
 	} );
 
-	test( "is a transform stream, actually", function() {
+	it( "is a transform stream, actually", function() {
 		const stream = new Stream();
 
 		stream.should.be.instanceOf( Transform );
 	} );
 
-	test( "rejects to process in object-mode", function() {
+	it( "rejects to process in object-mode", function() {
 		( () => new Stream( { objectMode: true } ) ).should.throw();
 		( () => new Stream( { objectMode: false } ) ).should.not.throw();
 	} );
 
-	test( "does not have any attached parser initially", function() {
+	it( "does not have any attached parser initially", function() {
 		const stream = new Stream();
 
 		Should.not.exist( stream.parser );
 	} );
 
-	test( "initially exposes parser provided on construction", function() {
+	it( "initially exposes parser provided on construction", function() {
 		const parser = new Parser();
 		const stream = new Stream( {
 			initialParser: parser
@@ -80,13 +81,13 @@ suite( "ParsingStream", function() {
 		stream.parser.should.equal( parser );
 	} );
 
-	test( "always exposes some context to use on parsing", function() {
+	it( "always exposes some context to use on parsing", function() {
 		const stream = new Stream();
 
 		stream.context.should.be.instanceOf( Context );
 	} );
 
-	test( "exposes same context provided on construction explicitly", function() {
+	it( "exposes same context provided on construction explicitly", function() {
 		const context = new Context();
 		const stream = new Stream( { context } );
 
@@ -94,8 +95,8 @@ suite( "ParsingStream", function() {
 	} );
 } );
 
-suite( "Piping data through ParsingStream", function() {
-	test( "passes all data piped through w/o attaching parser/filter", function() {
+describe( "Piping data through ParsingStream", function() {
+	it( "passes all data piped through w/o attaching parser/filter", function() {
 		const message = "Hello World!\x01Some data";
 
 		const source = new BufferStream.Reader( Buffer.from( message, "ascii" ), 2 );
@@ -112,7 +113,7 @@ suite( "Piping data through ParsingStream", function() {
 			} );
 	} );
 
-	test( "detects contained data as it passes using attached parser", function() {
+	it( "detects contained data as it passes using attached parser", function() {
 		const message = "I were there where is no atmosphere";
 
 		const parser = new SubstringParser( Buffer.from( "ere ", "ascii" ) );
@@ -162,7 +163,7 @@ suite( "Piping data through ParsingStream", function() {
 			} );
 	} );
 
-	test( "supports switching attached parser", function() {
+	it( "supports switching attached parser", function() {
 		const message = "I were there where is no atmosphere";
 
 		const parser1 = new SubstringParser( Buffer.from( "ere ", "ascii" ) );
@@ -221,7 +222,7 @@ suite( "Piping data through ParsingStream", function() {
 			} );
 	} );
 
-	test( "supports adjusting parser matches in stream", function() {
+	it( "supports adjusting parser matches in stream", function() {
 		const message = "I were there where is no atmosphere";
 
 		const parser = new SubstringParser( Buffer.from( "ere ", "ascii" ) );

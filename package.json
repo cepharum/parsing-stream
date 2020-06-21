@@ -4,8 +4,8 @@
   "description": "attaching parser/processor to NodeJS stream",
   "main": "index.js",
   "scripts": {
-    "test": "set NODE_ENV=test && mocha --ui tdd test",
-    "style": "eslint **/*.js"
+    "test": "set NODE_ENV=test && mocha --ui tdd --recursive 'test/**/*.spec.js'",
+    "style": "eslint '**/*.js'"
   },
   "repository": {
     "type": "git",
