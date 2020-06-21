@@ -19,14 +19,10 @@
   "author": "Thomas Urban <thomas.urban@cepharum.de>",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^4.7.2",
-    "eslint-config-cepharum": "^1.0.2",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-node": "^5.1.1",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "mocha": "^3.5.3",
-    "should": "^13.1.0"
+    "eslint": "^7.3.0",
+    "eslint-config-cepharum": "^1.0.11",
+    "eslint-plugin-promise": "^4.2.1",
+    "mocha": "^8.0.1",
+    "should": "^13.2.3"
   }
 }
